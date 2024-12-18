@@ -36,7 +36,8 @@ function unirElementos(array, separador = ", ") {
 function agregarCalificacion(nombre, calificacion) {
     for (let i = 0; i < estudiantes.length; i++) {
         if (estudiantes[i].nombre === nombre) {
-            estudiantes[i].calificaciones.push(calificacion);
+            const calificaciones = estudiantes[i].calificaciones;
+            calificaciones[calificaciones.length] = calificacion; // Añadir manualmente el elemento al final
             return;
         }
     }
@@ -70,8 +71,18 @@ function procesarEstudiantes() {
     for (let i = 0; i < estudiantes.length; i++) {
         const estudiante = estudiantes[i];
         const promedio = calcularPromedio(estudiante.calificaciones);
-        const maxCal = Math.max(...estudiante.calificaciones);
-        const minCal = Math.min(...estudiante.calificaciones);
+
+        // Calcular máximo y mínimo 
+        const { maxCal, minCal } = estudiante.calificaciones.reduce(
+            (acc, cal) => {
+                return {
+                    maxCal: cal > acc.maxCal ? cal : acc.maxCal,
+                    minCal: cal < acc.minCal ? cal : acc.minCal,
+                };
+            },
+            { maxCal: -Infinity, minCal: Infinity }
+        );
+
         const clasificacion = clasificarEstudiante(promedio);
 
         estudiante.promedio = promedio;
@@ -113,9 +124,9 @@ function imprimirResultados() {
     }
 
     console.log(`Estudiante con el mejor promedio es ${estudianteMejor.nombre} con un promedio de ${formatearDecimal(estudianteMejor.promedio)}`);
-    console.log(`Estudiante con la peor promedio es ${estudiantePeor.nombre} con un promedio de ${formatearDecimal(estudiantePeor.promedio)}`);
+    console.log(`Estudiante con el peor promedio es ${estudiantePeor.nombre} con un promedio de ${formatearDecimal(estudiantePeor.promedio)}`);
 }
 
-// Ejecutar el código
+
 agregarCalificacion("Pablo", 17);
 imprimirResultados();
